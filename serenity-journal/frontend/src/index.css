@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------
+   Serenity Journal — theme system
+   Each data-theme sets a small palette of CSS variables that every
+   component reads from. Switching themes is just swapping the
+   attribute on <html>; no component code changes.
+------------------------------------------------------------------ */
+
+:root {
+  --font-display: "Cormorant Garamond", serif;
+  --font-body: "Nunito", sans-serif;
+  --font-size-base: 16px;
+  --card-alpha: 0.8;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--ink, #2e2a26);
+  background: linear-gradient(160deg, var(--grad-from), var(--grad-to));
+  transition: background 0.6s ease, color 0.4s ease;
+  min-height: 100vh;
+}
+
+/* ---- Themes ---- */
+[data-theme="sakura"] {
+  --grad-from: #fdf1f4;
+  --grad-to: #f6dfe6;
+  --accent: #e8a0ac;
+  --accent-soft: #f6d3d9;
+  --ink: #3a2a2d;
+}
+[data-theme="ocean"] {
+  --grad-from: #eaf6f8;
+  --grad-to: #cfe9ef;
+  --accent: #5aa9c0;
+  --accent-soft: #bfe3ec;
+  --ink: #1f3a42;
+}
+[data-theme="forest"] {
+  --grad-from: #f1f6ee;
+  --grad-to: #dbe9d3;
+  --accent: #6f9b6a;
+  --accent-soft: #c9dec3;
+  --ink: #263626;
+}
+[data-theme="sunset"] {
+  --grad-from: #fff2e6;
+  --grad-to: #ffd8c2;
+  --accent: #e08a5b;
+  --accent-soft: #ffcaa8;
+  --ink: #402a1e;
+}
+[data-theme="midnight"] {
+  --grad-from: #1b1c2e;
+  --grad-to: #0f101c;
+  --accent: #8f9ce8;
+  --accent-soft: #33355a;
+  --ink: #e9e9f5;
+}
+[data-theme="cloud"] {
+  --grad-from: #f7f8fa;
+  --grad-to: #e6e9f0;
+  --accent: #9aa6c4;
+  --accent-soft: #dde2ee;
+  --ink: #2c2e38;
+}
+[data-theme="nature"] {
+  --grad-from: #f4f7ea;
+  --grad-to: #dfe8c4;
+  --accent: #8ba85b;
+  --accent-soft: #d8e3ba;
+  --ink: #2f3620;
+}
+[data-theme="lavender"] {
+  --grad-from: #f5f1fb;
+  --grad-to: #e2d6f2;
+  --accent: #a78bbe;
+  --accent-soft: #ddc9ee;
+  --ink: #322a3d;
+}
+[data-theme="daisy"] {
+  --grad-from: #fffdf0;
+  --grad-to: #fbf0c2;
+  --accent: #e0b83c;
+  --accent-soft: #f6e6a3;
+  --ink: #3a331a;
+}
+
+/* Dark mode: deepen every theme's gradient + shift ink to light */
+.dark[data-theme] {
+  --ink: #eef0f5;
+}
+.dark[data-theme="sakura"] { --grad-from: #2a1e22; --grad-to: #1c1416; }
+.dark[data-theme="ocean"] { --grad-from: #10262c; --grad-to: #0a1a1e; }
+.dark[data-theme="forest"] { --grad-from: #182619; --grad-to: #0e1810; }
+.dark[data-theme="sunset"] { --grad-from: #2e1d15; --grad-to: #1c110b; }
+.dark[data-theme="midnight"] { --grad-from: #0e0f1a; --grad-to: #07070d; }
+.dark[data-theme="cloud"] { --grad-from: #1c1e26; --grad-to: #131419; }
+.dark[data-theme="nature"] { --grad-from: #1b2213; --grad-to: #10150c; }
+.dark[data-theme="lavender"] { --grad-from: #211a2a; --grad-to: #150f1c; }
+.dark[data-theme="daisy"] { --grad-from: #2b2712; --grad-to: #19160a; }
+
+/* ---- Reusable primitives ---- */
+.glass-card {
+  background: color-mix(in srgb, white var(--card-alpha-pct, 80%), transparent);
+  backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-radius: 1.75rem;
+  box-shadow: 0 8px 30px rgba(46, 42, 38, 0.08);
+}
+.dark .glass-card {
+  background: color-mix(in srgb, #1a1b24 var(--card-alpha-pct, 80%), transparent);
+}
+
+.accent-text { color: var(--accent); }
+.accent-bg { background-color: var(--accent); }
+.font-display { font-family: var(--font-display); }
+
+::selection {
+  background: var(--accent-soft);
+}
+
+/* Scrollbar - soft and unobtrusive */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-thumb {
+  background: var(--accent-soft);
+  border-radius: 8px;
+}
+
+/* ---- Ensō signature mark: a hand-drawn ink circle that "completes"
+   itself, used as the loading mark / brand mark / completed-entry mark ---- */
+.enso-stroke {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 400;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
