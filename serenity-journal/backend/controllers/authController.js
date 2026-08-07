@@ -2,38 +2,30 @@ import User from "../models/User.js";
 import Settings from "../models/Settings.js";
 import generateToken from "../utils/generateToken.js";
 
-// @desc  Register a new user
+// @desc  Register or Login a user via username
 // @route POST /api/auth/register
 export const registerUser = async (req, res, next) => {
   try {
-    const { name, email, password, securityQuestion, securityAnswer } = req.body;
+    const { username } = req.body;
 
-    if (!name || !email || !password || !securityAnswer) {
+    if (!username || !username.trim()) {
       res.status(400);
-      throw new Error("Please fill in all required fields");
+      throw new Error("Please enter a username");
     }
 
-    const existing = await User.findOne({ email });
-    if (existing) {
-      res.status(400);
-      throw new Error("An account with this email already exists");
+    let user = await User.findOne({ username });
+    
+    // If user doesn't exist, register them
+    if (!user) {
+      user = await User.create({ username });
+      // Create default settings for the new user
+      await Settings.create({ user: user._id });
     }
 
-    const user = await User.create({
-      name,
-      email,
-      password,
-      securityQuestion,
-      securityAnswer,
-    });
-
-    // Create default settings for the new user
-    await Settings.create({ user: user._id });
-
-    res.status(201).json({
+    res.status(200).json({
       _id: user._id,
-      name: user.name,
-      email: user.email,
+      name: user.username,
+      username: user.username,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -41,66 +33,30 @@ export const registerUser = async (req, res, next) => {
   }
 };
 
-// @desc  Login user
+// @desc  Login user (fallback, behaves identically to register)
 // @route POST /api/auth/login
 export const loginUser = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const { username } = req.body;
 
-    if (!user || !(await user.matchPassword(password))) {
-      res.status(401);
-      throw new Error("Invalid email or password");
+    if (!username || !username.trim()) {
+      res.status(400);
+      throw new Error("Please enter a username");
     }
 
-    res.json({
+    let user = await User.findOne({ username });
+
+    if (!user) {
+      user = await User.create({ username });
+      await Settings.create({ user: user._id });
+    }
+
+    res.status(200).json({
       _id: user._id,
-      name: user.name,
-      email: user.email,
+      name: user.username,
+      username: user.username,
       token: generateToken(user._id),
     });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// @desc  Get the security question for an email (step 1 of local password reset)
-// @route POST /api/auth/forgot-password/question
-export const getSecurityQuestion = async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      res.status(404);
-      throw new Error("No account found with that email");
-    }
-    res.json({ securityQuestion: user.securityQuestion });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// @desc  Verify security answer and reset password (step 2, local, no email needed)
-// @route POST /api/auth/forgot-password/reset
-export const resetPassword = async (req, res, next) => {
-  try {
-    const { email, securityAnswer, newPassword } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      res.status(404);
-      throw new Error("No account found with that email");
-    }
-
-    const isMatch = await user.matchSecurityAnswer(securityAnswer);
-    if (!isMatch) {
-      res.status(401);
-      throw new Error("Security answer is incorrect");
-    }
-
-    user.password = newPassword;
-    await user.save();
-
-    res.json({ message: "Password reset successful. You can now log in." });
   } catch (error) {
     next(error);
   }
@@ -109,5 +65,9 @@ export const resetPassword = async (req, res, next) => {
 // @desc  Get current logged-in user
 // @route GET /api/auth/me
 export const getMe = async (req, res) => {
-  res.json(req.user);
+  // Convert username to name field for compatibility on frontend
+  const user = req.user.toObject ? req.user.toObject() : { ...req.user };
+  user.name = user.username;
+  res.json(user);
 };
+

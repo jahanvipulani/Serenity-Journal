@@ -20,18 +20,12 @@ const Landing = () => (
         A quiet place to write, breathe, and notice how you feel — one calm
         day at a time.
       </p>
-      <div className="flex gap-3 justify-center">
+      <div className="flex justify-center">
         <Link
           to="/register"
-          className="accent-bg text-white px-6 py-2.5 rounded-full font-medium shadow-soft hover:opacity-90 transition"
+          className="accent-bg text-white px-8 py-3 rounded-full font-medium shadow-soft hover:opacity-90 transition text-lg"
         >
           Begin journaling
-        </Link>
-        <Link
-          to="/login"
-          className="px-6 py-2.5 rounded-full font-medium border border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent-soft)] transition"
-        >
-          Log in
         </Link>
       </div>
     </motion.div>
