@@ -18,18 +18,19 @@ connectDB();
 const app = express();
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "https://serenity-journal-gamma.vercel.app/",
-  process.env.CLIENT_URL
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://serenity-journal-gamma.vercel.app",
+    process.env.CLIENT_URL?.replace(/\/$/, "")
 ].filter(Boolean);
 
 app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
+    cors({
+        origin: allowedOrigins,
+        credentials: true
+    })
 );
+
 app.use(express.json());
 if (process.env.NODE_ENV !== "test") app.use(morgan("dev"));
 
